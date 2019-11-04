@@ -1,5 +1,11 @@
 soc_hdrs = \
+  bh_mtag.h \
+  bh_soc_impl.h \
+  bh_uart.h \
   soc.h \
 
 soc_srcs = \
+	bh_mtag.cc \
+	bh_soc_impl.cc \
+	bh_uart.cc \
 	soc.cc \
