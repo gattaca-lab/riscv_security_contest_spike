@@ -64,14 +64,14 @@ private:
   static const size_t INTERLEAVE = 5000;
   static const size_t INSNS_PER_RTC_TICK = 100; // 10 MHz clock for 1 BIPS core
   static const size_t CPU_HZ = 1000000000; // 1GHz CPU
-  size_t current_step;
-  size_t current_proc;
-  bool debug;
-  bool log;
-  bool histogram_enabled; // provide a histogram of PCs
-  bool log_commits_enabled;
-  bool dtb_enabled;
-  remote_bitbang_t* remote_bitbang;
+  size_t current_step = 0;
+  size_t current_proc = 0;
+  bool debug = false;
+  bool log = false;
+  bool histogram_enabled = false; // provide a histogram of PCs
+  bool log_commits_enabled = false;
+  bool dtb_enabled = false;
+  remote_bitbang_t* remote_bitbang = nullptr;
 
   // memory-mapped I/O routines
   char* addr_to_mem(reg_t addr);

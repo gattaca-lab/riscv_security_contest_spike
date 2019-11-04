@@ -32,10 +32,8 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
              std::vector<int> const hartids,
              const debug_module_config_t &dm_config)
   : htif_t(args), mems(mems), plugin_devices(plugin_devices),
-    procs(std::max(nprocs, size_t(1))), start_pc(start_pc), current_step(0),
-    current_proc(0), debug(false), histogram_enabled(false),
-    log_commits_enabled(false), dtb_enabled(true),
-    remote_bitbang(NULL), debug_module(this, dm_config)
+    procs(std::max(nprocs, size_t(1))),
+    debug_module(this, dm_config)
 {
   signal(SIGINT, &handle_signal);
 
