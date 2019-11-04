@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@prefix@
+libdir=${prefix}/@libdir@
+includedir=${prefix}/@includedir@
+
+Name: riscv-soc
+Description: Example RISC-V SOC implementations
+Version: git
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lsoc
+Cflags: -I${includedir}
+URL: http://riscv.org/download.html#tab_spike

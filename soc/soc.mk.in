@@ -1,0 +1,5 @@
+soc_hdrs = \
+  soc.h \
+
+soc_srcs = \
+	soc.cc \
