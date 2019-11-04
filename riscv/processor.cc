@@ -188,7 +188,7 @@ void state_t::reset(reg_t max_isa)
   memset(this, 0, sizeof(*this));
   misa = max_isa;
   prv = PRV_M;
-  pc = DEFAULT_RSTVEC;
+  pc = 0; // DEFAULT_RSTVEC;
   tselect = 0;
   for (unsigned int i = 0; i < num_triggers; i++)
     mcontrol[i].type = 2;
