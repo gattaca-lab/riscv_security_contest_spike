@@ -30,6 +30,10 @@ static unsigned field_width(unsigned n)
 }
 
 ///////////////////////// debug_module_t
+//
+std::string debug_module_t::description() const {
+    return "weird and obscure debug module";
+}
 
 debug_module_t::debug_module_t(sim_t *sim, const debug_module_config_t &config) :
   nprocs(sim->nprocs()),

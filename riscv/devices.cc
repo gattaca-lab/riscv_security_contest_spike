@@ -1,13 +1,37 @@
 #include "devices.h"
+#include <stdio.h>
+#include <sstream>
 
+std::string rom_device_t::description() const {
+    std::stringstream ss;
+    ss << "rom size: " << data.size() <<
+        " (" << std::hex << "0x" << data.size() << ")";
+}
+std::string mem_t::description() const {
+    std::stringstream ss;
+    ss << "chunk size: " << len <<
+        " (" << std::hex << "0x" << len << ")";
+    return ss.str();
+}
+std::string clint_t::description() const {
+    return "timer?";
+}
+std::string mmio_plugin_device_t::description() const {
+    return "mmio_plugin";
+}
 void bus_t::add_device(reg_t addr, abstract_device_t* dev)
 {
+  if (!dev) {
+      return;
+  }
   // Searching devices via lower_bound/upper_bound
   // implicitly relies on the underlying std::map 
   // container to sort the keys and provide ordered
   // iteration over this sort, which it does. (python's
   // SortedDict is a good analogy)
   devices[addr] = dev;
+  fprintf(stderr, "adding device [%s], @%#x\n", dev->name(), (unsigned)addr);
+  fprintf(stderr, "   +%s\n", dev->description().c_str());
 }
 
 bool bus_t::load(reg_t addr, size_t len, uint8_t* bytes)
@@ -43,6 +67,7 @@ std::pair<reg_t, abstract_device_t*> bus_t::find_device(reg_t addr)
   // See comments in bus_t::load
   auto it = devices.upper_bound(addr);
   if (devices.empty() || it == devices.begin()) {
+    fprintf(stderr, "no device found, returning default\n");
     return std::make_pair((reg_t)0, (abstract_device_t*)NULL);
   }
   it--;

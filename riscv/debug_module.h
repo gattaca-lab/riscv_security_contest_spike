@@ -125,6 +125,9 @@ class debug_module_t : public abstract_device_t
     // Called when one of the attached harts was reset.
     void proc_reset(unsigned id);
 
+    virtual const char* name() const override { return "DEBUG_MODULE"; }
+    virtual std::string description() const override;
+
   private:
     static const unsigned datasize = 2;
     unsigned nprocs;

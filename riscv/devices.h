@@ -15,6 +15,9 @@ class abstract_device_t {
   virtual bool load(reg_t addr, size_t len, uint8_t* bytes) = 0;
   virtual bool store(reg_t addr, size_t len, const uint8_t* bytes) = 0;
   virtual ~abstract_device_t() {}
+
+  virtual const char* name() const { return "UNKNOWN"; }
+  virtual std::string description() const { return "---description is empty"; }
 };
 
 class bus_t : public abstract_device_t {
@@ -35,6 +38,10 @@ class rom_device_t : public abstract_device_t {
   bool load(reg_t addr, size_t len, uint8_t* bytes);
   bool store(reg_t addr, size_t len, const uint8_t* bytes);
   const std::vector<char>& contents() { return data; }
+
+  virtual const char* name() const override { return "ROM"; }
+  virtual std::string description() const override;
+
  private:
   std::vector<char> data;
 };
@@ -56,6 +63,9 @@ class mem_t : public abstract_device_t {
   char* contents() { return data; }
   size_t size() { return len; }
 
+  virtual const char* name() const override { return "MEMORY"; }
+  virtual std::string description() const override;
+
  private:
   char* data;
   size_t len;
@@ -68,6 +78,10 @@ class clint_t : public abstract_device_t {
   bool store(reg_t addr, size_t len, const uint8_t* bytes);
   size_t size() { return CLINT_SIZE; }
   void increment(reg_t inc);
+
+  virtual const char* name() const override { return "CLINT"; }
+  virtual std::string description() const override;
+
  private:
   typedef uint64_t mtime_t;
   typedef uint64_t mtimecmp_t;
@@ -84,6 +98,9 @@ class mmio_plugin_device_t : public abstract_device_t {
 
   virtual bool load(reg_t addr, size_t len, uint8_t* bytes) override;
   virtual bool store(reg_t addr, size_t len, const uint8_t* bytes) override;
+
+  virtual const char* name() const override { return "MMIO_PLUGIN"; }
+  virtual std::string description() const override;
 
  private:
   mmio_plugin_t plugin;
