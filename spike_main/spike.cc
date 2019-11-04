@@ -85,16 +85,56 @@ static std::vector<std::pair<reg_t, mem_t*>> make_mems(const char* arg)
   std::vector<std::pair<reg_t, mem_t*>> res;
   while (true) {
     auto base = strtoull(arg, &p, 0);
-    if (!*p || *p != ':')
-      help();
-    auto size = strtoull(p + 1, &p, 0);
-    if ((size | base) % PGSIZE != 0)
-      help();
+    if (!*p || *p != ':') {
+      fprintf(stderr,
+              "argument error (-m): "
+              "invalid format of input arguments for memory. see --help\n");
+      exit(1);
+    }
+    unsigned long size = strtoull(p + 1, &p, 0);
+    unsigned long tmp_s = size;
+    bool overflow = false;
+    const unsigned KILO = 1024;
+    const unsigned MEGA = 1024 * 1024;
+    const unsigned GIGA = MEGA * KILO;
+    switch(*p) {
+    case 'K':
+        tmp_s = size * KILO;
+        overflow = (tmp_s / KILO) != size;
+        break;
+    case 'M':
+        tmp_s = size * MEGA;
+        overflow = (tmp_s / MEGA) != size;
+        break;
+    case 'G':
+        tmp_s = size * GIGA;
+        overflow = (tmp_s / GIGA) != size;
+        break;
+    }
+    if (overflow) {
+        fprintf(stderr,
+                "argument error (-m): "
+                "size overflow detected, raw: %lu, result %lu, suffix %c\n",
+                size, tmp_s, *p);
+        exit(1);
+    }
+    if (size != tmp_s) {
+        ++p;
+    }
+    size = tmp_s;
+    if ((size | base) % PGSIZE != 0) {
+      fprintf(stderr,
+              "argument error (-m): "
+              "memory chunk size must be divisible to 4096. see --help\n");
+      exit(1);
+    }
     res.push_back(std::make_pair(reg_t(base), new mem_t(size)));
     if (!*p)
       break;
-    if (*p != ',')
-      help();
+    if (*p != ',') {
+      fprintf(stderr, "argument error (-m): invalid format. see --help\n");
+      exit(1);
+    }
     arg = p + 1;
   }
   return res;
