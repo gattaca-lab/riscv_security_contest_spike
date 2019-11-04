@@ -368,6 +368,23 @@ void processor_t::take_trap(trap_t& t, reg_t epc)
           t.get_tval());
   }
 
+  if (      (state.XPR[2] == 0)
+      && (   t.cause() == CAUSE_MACHINE_ECALL
+          || t.cause() == CAUSE_HYPERVISOR_ECALL
+          || t.cause() == CAUSE_USER_ECALL
+          || t.cause() == CAUSE_SUPERVISOR_ECALL)
+     ) {
+      fprintf(stderr, "core %d, TEST_EXIT sequence detected!\n", id);
+      int status_code = (state.XPR[1] == 0x0A11C001)
+                      ? EXIT_SUCCESS
+                      : EXIT_FAILURE;
+      if (status_code == EXIT_SUCCESS)
+          fprintf(stderr, "test result: SUCCESS\n");
+      else
+          fprintf(stderr, "test result: FAILURE\n");
+      exit(status_code);
+  }
+
   if (state.debug_mode) {
     if (t.cause() == CAUSE_BREAKPOINT) {
       state.pc = DEBUG_ROM_ENTRY;
