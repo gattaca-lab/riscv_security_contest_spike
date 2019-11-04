@@ -47,11 +47,11 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
   for (auto& x : plugin_devices)
     bus.add_device(x.first, x.second);
 
-  debug_module.add_device(&bus);
   soc_ = abstract_soc_t::create(soc_config.c_str(), *this);
   if (soc_) {
       soc_->add_device(bus);
   }
+  // debug_module.add_device(&bus);
 
   debug_mmu = new mmu_t(this, NULL);
 
@@ -215,7 +215,8 @@ void sim_t::make_dtb()
   rom.resize((rom.size() + align - 1) / align * align);
 
   boot_rom.reset(new rom_device_t(rom));
-  bus.add_device(DEFAULT_RSTVEC, boot_rom.get());
+  // fprintf(stderr, "adding DTB rom\n");
+  // bus.add_device(DEFAULT_RSTVEC, boot_rom.get());
 }
 
 char* sim_t::addr_to_mem(reg_t addr) {
