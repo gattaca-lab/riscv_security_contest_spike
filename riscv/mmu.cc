@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "simif.h"
 #include "processor.h"
+#include <stdio.h>
 
 mmu_t::mmu_t(simif_t* sim, processor_t* proc)
  : sim(sim), proc(proc),
@@ -127,6 +128,9 @@ void mmu_t::store_slow_path(reg_t addr, reg_t len, const uint8_t* bytes)
 {
   reg_t paddr = translate(addr, len, STORE);
 
+  // fprintf(stderr, "add = %#x, len = %d, paddr = %#x\n",
+  //         (unsigned int)addr, (unsigned int)len, (unsigned int)paddr);
+
   if (!matched_trigger) {
     reg_t data = reg_from_bytes(len, bytes);
     matched_trigger = trigger_exception(OPERATION_STORE, addr, data);
@@ -141,6 +145,7 @@ void mmu_t::store_slow_path(reg_t addr, reg_t len, const uint8_t* bytes)
     else
       refill_tlb(addr, paddr, host_addr, STORE);
   } else if (!sim->mmio_store(paddr, len, bytes)) {
+    fprintf(stderr, "address is not even MMIO, trapping...\n");
     throw trap_store_access_fault(addr);
   }
 }

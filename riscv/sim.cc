@@ -19,6 +19,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
+#include <stdio.h>
+
 volatile bool ctrlc_pressed = false;
 static void handle_signal(int sig)
 {
@@ -220,12 +222,22 @@ void sim_t::make_dtb()
 }
 
 char* sim_t::addr_to_mem(reg_t addr) {
-  if (!paddr_ok(addr))
+  if (!paddr_ok(addr)) {
+    fprintf(stderr, "!paddr_ok\n");
     return NULL;
+  }
   auto desc = bus.find_device(addr);
-  if (auto mem = dynamic_cast<mem_t*>(desc.second))
+
+  if (auto mem = dynamic_cast<mem_t*>(desc.second)) {
+    fprintf(stderr,
+            "fisrt: %#x, size: %d\n",
+            (unsigned)desc.first, (unsigned)(mem->size()));
     if (addr - desc.first < mem->size())
       return mem->contents() + (addr - desc.first);
+  } else {
+    fprintf(stderr, "address: %lx, MMIO access?\n", addr);
+  }
+
   return NULL;
 }
 
