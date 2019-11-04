@@ -20,6 +20,7 @@ static void help(int exit_code = 1)
   fprintf(stderr, "usage: spike [host options] <target program> [target options]\n");
   fprintf(stderr, "Host Options:\n");
   fprintf(stderr, "  -p<n>                 Simulate <n> processors [default 1]\n");
+  fprintf(stderr, "  --soc=<name>[:opts]   instantiate SOC called <name> with options <opts>\n");
   fprintf(stderr, "  -m<n>                 Provide <n> MiB of target memory [default 2048]\n");
   fprintf(stderr, "  -m<a:m,b:n,...>       Provide memory regions of size m and n bytes\n");
   fprintf(stderr, "                          at base addresses a and b (with 4 KiB alignment)\n");
@@ -229,6 +230,8 @@ int main(int argc, char** argv)
     plugin_devices.emplace_back(base, new mmio_plugin_device_t(name, args));
   };
 
+  std::string soc_string;
+
   option_parser_t parser;
   parser.help(&suggest_help);
   parser.option('h', "help", 0, [&](const char* s){help(0);});
@@ -247,6 +250,7 @@ int main(int argc, char** argv)
   parser.option(0, "l2", 1, [&](const char* s){l2.reset(cache_sim_t::construct(s, "L2$"));});
   parser.option(0, "log-cache-miss", 0, [&](const char* s){log_cache = true;});
   parser.option(0, "isa", 1, [&](const char* s){isa = s;});
+  parser.option(0, "soc", 1, [&](const char* s) { soc_string = s; });
   parser.option(0, "varch", 1, [&](const char* s){varch = s;});
   parser.option(0, "device", 1, device_parser);
   parser.option(0, "extension", 1, [&](const char* s){extension = find_extension(s);});
@@ -286,7 +290,7 @@ int main(int argc, char** argv)
     help();
 
   sim_t s(isa, varch, nprocs, halted, start_pc, mems, plugin_devices, htif_args,
-      std::move(hartids), dm_config);
+      std::move(hartids), dm_config, soc_string);
   std::unique_ptr<remote_bitbang_t> remote_bitbang((remote_bitbang_t *) NULL);
   std::unique_ptr<jtag_dtm_t> jtag_dtm(
       new jtag_dtm_t(&s.debug_module, dmi_rti));

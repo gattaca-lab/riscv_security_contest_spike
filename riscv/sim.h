@@ -16,6 +16,7 @@
 
 class mmu_t;
 class remote_bitbang_t;
+class abstract_soc_t;
 
 // this class encapsulates the processors and memory in a RISC-V machine.
 class sim_t : public htif_t, public simif_t
@@ -25,7 +26,8 @@ public:
         reg_t start_pc, std::vector<std::pair<reg_t, mem_t*>> mems,
         std::vector<std::pair<reg_t, abstract_device_t*>> plugin_devices,
         const std::vector<std::string>& args, const std::vector<int> hartids,
-        const debug_module_config_t &dm_config);
+        const debug_module_config_t &dm_config,
+        const std::string& soc_config);
   ~sim_t();
 
   // run the simulation to completion
@@ -126,6 +128,9 @@ public:
   // enumerate processors, which segfaults if procs hasn't been initialized
   // yet.
   debug_module_t debug_module;
+
+  friend class abstract_soc_t;
+  std::unique_ptr<abstract_soc_t> soc_;
 };
 
 extern volatile bool ctrlc_pressed;

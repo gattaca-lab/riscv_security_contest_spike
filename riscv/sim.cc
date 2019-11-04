@@ -1,10 +1,13 @@
 // See LICENSE for license details.
 
+#include "soc/soc.h"
+
 #include "sim.h"
 #include "mmu.h"
 #include "dts.h"
 #include "remote_bitbang.h"
 #include "byteorder.h"
+
 #include <map>
 #include <iostream>
 #include <sstream>
@@ -30,7 +33,8 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
              std::vector<std::pair<reg_t, abstract_device_t*>> plugin_devices,
              const std::vector<std::string>& args,
              std::vector<int> const hartids,
-             const debug_module_config_t &dm_config)
+             const debug_module_config_t &dm_config,
+             const std::string& soc_config)
   : htif_t(args), mems(mems), plugin_devices(plugin_devices),
     procs(std::max(nprocs, size_t(1))),
     debug_module(this, dm_config)
@@ -44,6 +48,10 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
     bus.add_device(x.first, x.second);
 
   debug_module.add_device(&bus);
+  soc_ = abstract_soc_t::create(soc_config.c_str(), *this);
+  if (soc_) {
+      soc_->add_device(bus);
+  }
 
   debug_mmu = new mmu_t(this, NULL);
 
@@ -89,6 +97,7 @@ void sim_t::main()
       interactive();
     else
       step(INTERLEAVE);
+
     if (remote_bitbang) {
       remote_bitbang->tick();
     }
