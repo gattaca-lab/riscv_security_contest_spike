@@ -42,5 +42,6 @@ bh_soc_t::bh_soc_t(sim_t& sim, const char* options)
         }
     }
     uart_.init(soc_opts.io_port);
+    mtag_.initialize(sim);
 }
 

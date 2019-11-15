@@ -5,6 +5,10 @@
 #include "processor.h"
 #include <stdio.h>
 
+void mmu_t::EXT_attach_mtags (mtag_ext_t* ext) {
+    mtags = ext;
+}
+
 mmu_t::mmu_t(simif_t* sim, processor_t* proc)
  : sim(sim), proc(proc),
   check_triggers_fetch(false),

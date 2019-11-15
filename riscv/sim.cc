@@ -49,10 +49,6 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
   for (auto& x : plugin_devices)
     bus.add_device(x.first, x.second);
 
-  soc_ = abstract_soc_t::create(soc_config.c_str(), *this);
-  if (soc_) {
-      soc_->add_device(bus);
-  }
   // debug_module.add_device(&bus);
 
   debug_mmu = new mmu_t(this, NULL);
@@ -70,6 +66,11 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
     for (size_t i = 0; i < procs.size(); i++) {
       procs[i] = new processor_t(isa, varch, this, hartids[i], halted);
     }
+  }
+
+  soc_ = abstract_soc_t::create(soc_config.c_str(), *this);
+  if (soc_) {
+      soc_->add_device(bus);
   }
 
   clint.reset(new clint_t(procs));

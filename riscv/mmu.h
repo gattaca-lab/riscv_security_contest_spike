@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <vector>
 
+class mtag_ext_t;
+
 // virtual memory configuration
 #define PGSHIFT 12
 const reg_t PGSIZE = 1 << PGSHIFT;
@@ -298,7 +300,11 @@ public:
 #endif
   }
 
+  void EXT_attach_mtags (mtag_ext_t* ext);
+
 private:
+  mtag_ext_t* mtags = nullptr;
+
   simif_t* sim;
   processor_t* proc;
   memtracer_list_t tracer;
