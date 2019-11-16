@@ -901,6 +901,13 @@ reg_t processor_t::get_csr(int which)
       if (!supports_extension('V'))
         break;
       return VU.vtype;
+    case CSR_MTAGCR:
+      fprintf(stderr,
+              "%s",
+              "   I am thou... Thou art I...\n"
+              "   I'm the bone of the Beehive.\n"
+              "   Behold! The BeeKing.\n");
+      return 0;
   }
   throw trap_illegal_instruction(0);
 }

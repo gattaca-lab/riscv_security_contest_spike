@@ -247,3 +247,23 @@ static uint32_t srli(unsigned int dest, unsigned int src, uint8_t shamt)
 		(dest << 7) |
 		MATCH_SRLI;
 }
+
+// mtag extention
+static uint32_t mtag_st(unsigned int src, unsigned int base, uint16_t offset) __attribute__ ((unused));
+static uint32_t mtag_st(unsigned int src, unsigned int base, uint16_t offset)
+{
+  return (bits(offset, 11, 5) << 25) |
+    (src << 20) |
+    (base << 15) |
+    (bits(offset, 4, 0) << 7) |
+    MATCH_MTAG_ST;
+}
+// mtag extention
+static uint32_t mtag_lt(unsigned int rd, unsigned int base, uint16_t offset) __attribute__ ((unused));
+static uint32_t mtag_lt(unsigned int rd, unsigned int base, uint16_t offset)
+{
+  return (bits(offset, 11, 0) << 20) |
+    (base << 15) |
+    (bits(rd, 4, 0) << 7) |
+    MATCH_MTAG_LT;
+}

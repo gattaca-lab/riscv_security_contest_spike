@@ -394,6 +394,10 @@ disassembler_t::disassembler_t(int xlen)
   DEFINE_XSTORE(sw)
   DEFINE_XSTORE(sd)
 
+  // mtag extention LT/ST
+  DEFINE_XLOAD(mtag_lt)
+  DEFINE_XSTORE(mtag_st)
+
   DEFINE_XAMO(amoadd_w)
   DEFINE_XAMO(amoswap_w)
   DEFINE_XAMO(amoand_w)
