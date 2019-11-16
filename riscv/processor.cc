@@ -20,13 +20,6 @@
 #undef STATE
 #define STATE state
 
-void processor_t::EXT_attach_mtags (mtag_ext_t* ext) {
-    mtags = ext;
-    if (!mmu) {
-        throw std::logic_error("the processor does not have initilized mmu");
-    }
-    mmu->EXT_attach_mtags(ext);
-}
 processor_t::processor_t(const char* isa, const char* varch, simif_t* sim,
                          uint32_t id, bool halt_on_reset)
   : debug(false), halt_request(false), sim(sim), ext(NULL), id(id),

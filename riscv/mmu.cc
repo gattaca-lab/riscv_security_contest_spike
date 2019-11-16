@@ -8,6 +8,12 @@
 void mmu_t::EXT_attach_mtags (mtag_ext_t* ext) {
     mtags = ext;
 }
+mtag_ext_t& mmu_t::get_imtag() {
+    if (!mtags) {
+        throw std::runtime_error("tags are not initialized when requested");
+    }
+    return *mtags;
+}
 
 mmu_t::mmu_t(simif_t* sim, processor_t* proc)
  : sim(sim), proc(proc),

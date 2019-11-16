@@ -2,6 +2,7 @@
 
 #include "arith.h"
 #include "mmu.h"
+#include "bh_mtag.h"
 #include "softfloat.h"
 #include "internals.h"
 #include "specialize.h"

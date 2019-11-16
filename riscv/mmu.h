@@ -301,6 +301,7 @@ public:
   }
 
   void EXT_attach_mtags (mtag_ext_t* ext);
+  mtag_ext_t& get_imtag();
 
 private:
   mtag_ext_t* mtags = nullptr;

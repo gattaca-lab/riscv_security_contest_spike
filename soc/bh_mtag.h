@@ -2,6 +2,7 @@
 
 #include "devices.h"
 
+class sim_t;
 struct s_mtag_impl;
 
 class mtag_ext_t {

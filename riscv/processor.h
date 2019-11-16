@@ -12,7 +12,6 @@
 #include <cassert>
 #include "debug_rom_defines.h"
 
-class mtag_ext_t;
 class processor_t;
 class mmu_t;
 typedef reg_t (*insn_func_t)(processor_t*, insn_t, reg_t);
@@ -302,8 +301,6 @@ public:
               bool halt_on_reset=false);
   ~processor_t();
 
-  void EXT_attach_mtags (mtag_ext_t* ext);
-
   void set_debug(bool value);
   void set_histogram(bool value);
   void set_log_commits(bool value);
@@ -438,7 +435,6 @@ public:
 private:
   simif_t* sim;
   mmu_t* mmu; // main memory is always accessed via the mmu
-  mtag_ext_t* mtags;
   extension_t* ext;
   disassembler_t* disassembler;
   state_t state;
