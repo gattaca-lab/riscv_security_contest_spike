@@ -494,6 +494,9 @@ void processor_t::set_csr(int which, reg_t val)
 
   switch (which)
   {
+    case CSR_RND:
+      state.hwrnd = val;
+      break;
     case CSR_MTAGCR:
       state.mtagcr = val;
       if (state.mtagcr & MTAG_FLD_IACK) {
@@ -934,6 +937,10 @@ reg_t processor_t::get_csr(int which)
       if (!supports_extension('V'))
         break;
       return VU.vtype;
+    case CSR_RND:
+      // so random...
+      state.hwrnd = state.hwrnd + 1;
+      return state.hwrnd;
     case CSR_MTAGCR:
       return state.mtagcr;
   }
