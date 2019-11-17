@@ -133,12 +133,14 @@ void processor_t::step(size_t n)
 
     try
     {
+      // fprintf(stderr, "take peinding...\n");
       take_pending_interrupt();
 
       if (unlikely(slow_path()))
       {
         while (instret < n)
         {
+          // fprintf(stderr, "instret = %ld, N=%ld\n", instret, n);
           if (unlikely(!state.serialized && state.single_step == state.STEP_STEPPED)) {
             state.single_step = state.STEP_NONE;
             if (!state.debug_mode) {
@@ -152,6 +154,7 @@ void processor_t::step(size_t n)
             state.single_step = state.STEP_STEPPED;
           }
 
+          //fprintf(stderr, "loading instruction...\n");
           insn_fetch_t fetch = mmu->load_insn(pc);
           if (debug && !state.serialized)
             disasm(fetch.insn);
@@ -189,11 +192,15 @@ void processor_t::step(size_t n)
         // statement below. The indirect jump corresponding to the instruction
         // is located within the execute_insn() function call.
         #define ICACHE_ACCESS(i) { \
+          /* fprintf(stderr, "icache access...\n");*/  \
           insn_fetch_t fetch = ic_entry->data; \
           pc = execute_insn(this, pc, fetch); \
           ic_entry = ic_entry->next; \
           if (i == mmu_t::ICACHE_ENTRIES-1) break; \
-          if (unlikely(ic_entry->tag != pc)) break; \
+          if (unlikely(ic_entry->tag != pc)) { \
+              /* fprintf(stderr, "icache miss, breaking...\n");*/ \
+              break; \
+          } \
           if (unlikely(instret+1 == n)) break; \
           instret++; \
           state.pc = pc; \

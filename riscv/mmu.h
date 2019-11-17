@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "soc/bh_mtag.h"
+
 class mtag_ext_t;
 
 // virtual memory configuration
@@ -85,6 +87,10 @@ public:
   // template for functions that load an aligned value from memory
   #define load_func(type) \
     inline type##_t load_##type(reg_t addr) { \
+      if (mtags) { \
+        mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
+        addr = mtags->untag_address(addr); \
+      } \
       if (unlikely(addr & (sizeof(type##_t)-1))) \
         return misaligned_load(addr, sizeof(type##_t)); \
       reg_t vpn = addr >> PGSHIFT; \
@@ -129,6 +135,10 @@ public:
   // template for functions that store an aligned value to memory
   #define store_func(type) \
     void store_##type(reg_t addr, type##_t val) { \
+      if (mtags) { \
+        mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::S); \
+        addr = mtags->untag_address(addr); \
+      } \
       if (unlikely(addr & (sizeof(type##_t)-1))) \
         return misaligned_store(addr, val, sizeof(type##_t)); \
       reg_t vpn = addr >> PGSHIFT; \

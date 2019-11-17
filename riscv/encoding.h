@@ -105,6 +105,12 @@
 #define MIP_HEIP            (1 << IRQ_H_EXT)
 #define MIP_MEIP            (1 << IRQ_M_EXT)
 
+// mtag hack
+#define MIP_EXT_MTAG_IP     (1 << IRQ_EXT_SM_PAINIC)
+#define MTAG_FLD_ICEN  (1 << 2)
+#define MTAG_FLD_IACK  (1 << 1)
+#define MTAG_FLD_LSEN  (1 << 0)
+
 #define SIP_SSIP MIP_SSIP
 #define SIP_STIP MIP_STIP
 
@@ -149,6 +155,8 @@
 #define IRQ_M_EXT    11
 #define IRQ_COP      12
 #define IRQ_HOST     13
+
+#define IRQ_EXT_SM_PAINIC 16
 
 #define DEFAULT_RSTVEC     0x00001000
 #define CLINT_BASE         0x02000000

@@ -33,20 +33,20 @@ struct s_mtag_impl {
     const unsigned INVALID_MAPPING = ~0u;
 };
 reg_t s_mtag_impl::untag_address(reg_t addr) const {
-    return addr & MASK_UNTAG;
+  return (addr & MASK_UNTAG) | (addr & MASK_VALIDATION);
 }
 unsigned s_mtag_impl::extract_tag(reg_t addr) const {
-    return ((addr & MASK_TAG) >> 26) & 0xf;
+  return ((addr & MASK_TAG) >> 26) & 0xf;
 }
 unsigned s_mtag_impl::va2tag(reg_t addr) const {
-    if (!validate_address(addr)) {
-        return INVALID_MAPPING;
-    }
-    reg_t untagged = untag_address(addr);
-    return untagged / GRANULE_SIZE;
+  if (!validate_address(addr)) {
+    return INVALID_MAPPING;
+  }
+  reg_t untagged = untag_address(addr);
+  return untagged / GRANULE_SIZE;
 }
 bool s_mtag_impl::validate_address(reg_t addr) const {
-    return (addr & MASK_VALIDATION) == 0;
+  return (addr & MASK_VALIDATION) == 0;
 }
 
 mtag_ext_t::mtag_ext_t(s_mtag_impl& impl, processor_t& p)
@@ -59,8 +59,45 @@ mtag_ext_t::mtag_ext_t(s_mtag_impl& impl, processor_t& p)
 }
 
 bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
-    (void)addr;(void)size;(void)type;
-    return false;
+  if (mode_ == mode::none) {
+    return true;
+  }
+  if (mode_ == mode::ic) {
+    fprintf(stderr, "  WARNING: IC-LEVEL tag match is not implemented!\n");
+    return true;
+  }
+  if ((mode_ == mode::dc) && (type == op_type::I)) {
+    return true;
+  }
+  const unsigned SRC_TAG = impl_.extract_tag(addr);
+  for(unsigned i = impl_.va2tag(addr),
+      e = impl_.va2tag(addr + size - 1) + 1; i < e; ++i) {
+    unsigned dst_tag = ~0u;
+    load_tag(i * 16, dst_tag);
+    if (SRC_TAG != dst_tag) {
+      fprintf(stderr,
+              "  ATTENTION: INTRUDER DETECTED "
+              "[dst_tag=%u,src_tag=%u]!\n", dst_tag, SRC_TAG);
+      fprintf(stderr,
+              "  Breach ID: 0x%08lx (pure: 0x%08lx)\n",
+              addr, untag_address(addr));
+
+      // mtag hack
+      // The purpose of this hack is not to inroduce an additional
+      // processor-level signal/flag. We try to piggy-back on existing
+      // functionality. I believe that such implementation does not
+      // contradict RISCV spec
+      // (but our beehive SOC does not function this way).
+      proc_.get_state()->mip |= MIP_EXT_MTAG_IP;
+      proc_.get_state()->mie |= MIP_EXT_MTAG_IP;
+
+      return false;
+    }
+  }
+  return true;
+}
+reg_t mtag_ext_t::untag_address(reg_t addr) const {
+  return impl_.untag_address(addr);
 }
 bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
     if (!impl_.validate_address(addr)) {
@@ -76,7 +113,7 @@ bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
     // fprintf(stderr, "writing %u->@%u\n", tag, t_a);
     return true;
 }
-bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) {
+bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
     tag = 0;
     if (!impl_.validate_address(addr)) {
         fprintf(stderr, "  WARNING: mtag::store_tag - address validation failed\n");

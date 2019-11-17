@@ -223,6 +223,7 @@ struct state_t
   regfile_t<freg_t, NFPR, false> FPR;
 
   // control and status registers
+  reg_t mtagcr;
   reg_t prv;    // TODO: Can this be an enum instead?
   reg_t misa;
   reg_t mstatus;

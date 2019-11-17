@@ -6,6 +6,7 @@ std::string rom_device_t::description() const {
     std::stringstream ss;
     ss << "rom size: " << data.size() <<
         " (" << std::hex << "0x" << data.size() << ")";
+    return ss.str();
 }
 std::string mem_t::description() const {
     std::stringstream ss;

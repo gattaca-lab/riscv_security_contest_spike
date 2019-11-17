@@ -1,3 +1,6 @@
+#ifndef BH_MTAG_H_7AQMVLLT
+#define BH_MTAG_H_7AQMVLLT
+
 #include <memory>
 
 #include "devices.h"
@@ -7,13 +10,15 @@ struct s_mtag_impl;
 
 class mtag_ext_t {
 public:
+  static const reg_t MISMATCH = (reg_t)-1;
   mtag_ext_t(s_mtag_impl& impl, processor_t& p);
   enum class mode { none, dc, ic, both };
   enum class op_type { L, S, I };
 
   bool check_tag(reg_t addr, size_t size, op_type type) const;
+  reg_t untag_address(reg_t addr) const;
   bool store_tag(reg_t addr, unsigned tag);
-  bool load_tag(reg_t addr, unsigned& tag);
+  bool load_tag(reg_t addr, unsigned& tag) const;
   void set_mode(mode m);
 
 private:
@@ -40,4 +45,6 @@ public:
 private:
   std::unique_ptr<s_mtag_impl> impl_;
 };
+
+#endif /* end of include guard:  */
 

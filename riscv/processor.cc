@@ -286,6 +286,7 @@ static int ctz(reg_t val)
 
 void processor_t::take_interrupt(reg_t pending_interrupts)
 {
+  // fprintf(stderr, "....trying to take interrupt...\n");
   reg_t mie = get_field(state.mstatus, MSTATUS_MIE);
   reg_t m_enabled = state.prv < PRV_M || (state.prv == PRV_M && mie);
   reg_t enabled_interrupts = pending_interrupts & ~state.mideleg & -m_enabled;
@@ -493,6 +494,45 @@ void processor_t::set_csr(int which, reg_t val)
 
   switch (which)
   {
+    case CSR_MTAGCR:
+      state.mtagcr = val;
+      if (state.mtagcr & MTAG_FLD_IACK) {
+        if (state.mip & MIP_EXT_MTAG_IP) {
+          fprintf(stderr, "  mtags: pending interrupt acknowledged\n");
+          // hack to make mtags work
+          state.mip ^= MIP_EXT_MTAG_IP;
+        }
+      }
+      {
+        bool icen = (state.mtagcr & MTAG_FLD_ICEN);
+        bool lsen = (state.mtagcr & MTAG_FLD_LSEN);
+        if (icen && lsen)
+          mmu->get_imtag().set_mode(mtag_ext_t::mode::both);
+        else if (icen)
+          mmu->get_imtag().set_mode(mtag_ext_t::mode::ic);
+        else if (lsen)
+          mmu->get_imtag().set_mode(mtag_ext_t::mode::dc);
+        else
+          mmu->get_imtag().set_mode(mtag_ext_t::mode::none);
+
+        reg_t prev_mtag_ip = state.mie & MIP_EXT_MTAG_IP;
+        // hack to make mtags work
+        state.mie ^= (!lsen && !icen) ? 0 : MIP_EXT_MTAG_IP;
+
+        // if we changed mie.mtag_IE
+        if ((prev_mtag_ip & state.mie) == 0) {
+          if (state.mie & MIP_EXT_MTAG_IP) {
+            fprintf(stderr,
+                    "%s",
+                    "   I am thou... Thou art I...\n"
+                    "   I'm the bone of the Beehive.\n"
+                    "   Behold! The BeeKing.\n");
+          } else {
+            fprintf(stderr, "  mtag: mtag checking disabled\n");
+          }
+        }
+      }
+      break;
     case CSR_FFLAGS:
       dirty_fp_state;
       state.fflags = val & (FSR_AEXC >> FSR_AEXC_SHIFT);
@@ -895,12 +935,7 @@ reg_t processor_t::get_csr(int which)
         break;
       return VU.vtype;
     case CSR_MTAGCR:
-      fprintf(stderr,
-              "%s",
-              "   I am thou... Thou art I...\n"
-              "   I'm the bone of the Beehive.\n"
-              "   Behold! The BeeKing.\n");
-      return 0;
+      return state.mtagcr;
   }
   throw trap_illegal_instruction(0);
 }
