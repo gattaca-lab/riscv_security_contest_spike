@@ -253,6 +253,7 @@ struct state_t
   mcontrol_t mcontrol[num_triggers];
   reg_t tdata2[num_triggers];
   bool debug_mode;
+  bool pessimize_execution = false;
 
   static const int n_pmp = 16;
   uint8_t pmpcfg[n_pmp];

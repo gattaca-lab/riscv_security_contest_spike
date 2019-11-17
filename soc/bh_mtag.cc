@@ -90,6 +90,9 @@ bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
       // (but our beehive SOC does not function this way).
       proc_.get_state()->mip |= MIP_EXT_MTAG_IP;
       proc_.get_state()->mie |= MIP_EXT_MTAG_IP;
+      // to ensure that we bail out from "iffecient" execution path
+      proc_.get_state()->pessimize_execution = true;
+      proc_.get_mmu()->flush_icache();
 
       return false;
     }

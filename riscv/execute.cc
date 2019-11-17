@@ -160,6 +160,9 @@ void processor_t::step(size_t n)
             disasm(fetch.insn);
           pc = execute_insn(this, pc, fetch);
           advance_pc();
+
+          if (unlikely(state.pessimize_execution))
+              break;
         }
       }
       else while (instret < n)
@@ -214,6 +217,9 @@ void processor_t::step(size_t n)
         }
 
         advance_pc();
+
+        if (unlikely(state.pessimize_execution))
+            break;
       }
     }
     catch(trap_t& t)
@@ -264,6 +270,8 @@ void processor_t::step(size_t n)
       // there is activity.
       n = instret;
     }
+    // fprintf(stderr, "loop finished...\n");
+    state.pessimize_execution = false;
 
     state.minstret += instret;
     n -= instret;
