@@ -24,6 +24,7 @@ bool get_str_val(const std::string& input,
 void bh_soc_t::add_device(bus_t& bus)
 {
     bus.add_device(bh_uart_t::ADDR_BASE, &uart_);
+    bus.add_device(bh_timer_t::DEVICE_BASE, &timer_);
 }
 bh_soc_t::bh_soc_t(sim_t& sim, const char* options)
     :sim_(sim)
@@ -43,5 +44,6 @@ bh_soc_t::bh_soc_t(sim_t& sim, const char* options)
     }
     uart_.init(soc_opts.io_port);
     mtag_.initialize(sim);
+    timer_.initialize(sim);
 }
 

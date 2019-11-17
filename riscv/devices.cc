@@ -49,6 +49,10 @@ bool bus_t::load(reg_t addr, size_t len, uint8_t* bytes)
   // The iterator points to the device after this, so
   // go back by one item.
   it--;
+  /*
+  fprintf(stderr, "bus_t::load input addr: %x, result: %x, base: %x\n",
+          (int)addr, (int)(addr - it->first), (int)it->first);
+  */
   return it->second->load(addr - it->first, len, bytes);
 }
 
@@ -60,6 +64,10 @@ bool bus_t::store(reg_t addr, size_t len, const uint8_t* bytes)
     return false;
   }
   it--;
+  /*
+  fprintf(stderr, "bus_t::store input addr: %x, result: %x, base: %x\n",
+          (int)addr, (int)(addr - it->first), (int)it->first);
+  */
   return it->second->store(addr - it->first, len, bytes);
 }
 

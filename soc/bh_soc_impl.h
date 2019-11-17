@@ -5,12 +5,12 @@
 
 #include "soc/bh_uart.h"
 #include "soc/bh_mtag.h"
-
-#include <memory>
+#include "soc/bh_timer.h"
 
 struct bh_soc_options {
     std::string io_port;
 };
+
 class bh_soc_t: public abstract_soc_t {
 public:
     void add_device(bus_t& bus) override;
@@ -21,6 +21,7 @@ private:
 
     bh_uart_t uart_;
     bh_mtag_t mtag_;
+    bh_timer_t timer_;
 };
 
 

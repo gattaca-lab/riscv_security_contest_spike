@@ -138,8 +138,10 @@ void mmu_t::store_slow_path(reg_t addr, reg_t len, const uint8_t* bytes)
 {
   reg_t paddr = translate(addr, len, STORE);
 
-  // fprintf(stderr, "add = %#x, len = %d, paddr = %#x\n",
-  //         (unsigned int)addr, (unsigned int)len, (unsigned int)paddr);
+  /*
+  fprintf(stderr, "__addr = %#x, len = %d, paddr = %#x\n",
+           (unsigned int)addr, (unsigned int)len, (unsigned int)paddr);
+  */
 
   if (!matched_trigger) {
     reg_t data = reg_from_bytes(len, bytes);
