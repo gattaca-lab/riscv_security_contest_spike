@@ -26,7 +26,8 @@ bool bh_uart_t::init(std::string io_port) {
                         O_WRONLY | O_TRUNC | O_CREAT,
                         S_IRUSR | S_IWUSR);
         if (io_port_ < 0) {
-            fprintf(stderr, "uart error: could not initialize io_port\n");
+            fprintf(stderr,
+                    "  [uart error]: could not initialize io_port\n");
             exit(EXIT_FAILURE);
             return false;
         }
@@ -43,12 +44,14 @@ bool bh_uart_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
     switch(addr) {
     case OFFSET_TX:
         if (len != 1) {
-            fprintf(stderr, "uart TX invalid data size! (%zu)\n", len);
+            fprintf(stderr,
+                    "  [uart warning] TX invalid data size! (%zu)\n", len);
         }
         write(io_port_, bytes, 1);
         break;
     default:
-        fprintf(stderr, "uart error: unknown write operation requested "
+        fprintf(stderr,
+                "  [uart warning] unknown write operation requested "
                 "addr = %lx, size = %zu\n", addr, len);
     }
     return true;

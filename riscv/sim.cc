@@ -238,7 +238,7 @@ char* sim_t::addr_to_mem(reg_t addr) {
     if (addr - desc.first < mem->size())
       return mem->contents() + (addr - desc.first);
   } else {
-    fprintf(stderr, "address: %lx, MMIO access?\n", addr);
+    // fprintf(stderr, "address: %lx, MMIO access?\n", addr);
   }
 
   return NULL;
