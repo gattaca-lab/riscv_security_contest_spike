@@ -359,6 +359,13 @@ void processor_t::enter_debug_mode(uint8_t cause)
   state.pc = DEBUG_ROM_ENTRY;
 }
 
+typedef void (*pre_exit_handler) ();
+pre_exit_handler ptr_pre_exit_handler = nullptr;
+
+void register_pre_exit_handler(pre_exit_handler p) {
+  ptr_pre_exit_handler  = p;
+}
+
 void processor_t::take_trap(trap_t& t, reg_t epc)
 {
   if (debug) {
@@ -383,6 +390,10 @@ void processor_t::take_trap(trap_t& t, reg_t epc)
           fprintf(stderr, "test result: SUCCESS\n");
       else
           fprintf(stderr, "test result: FAILURE\n");
+
+      if (ptr_pre_exit_handler)
+        ptr_pre_exit_handler();
+
       exit(status_code);
   }
 

@@ -14,6 +14,48 @@
 #include <memory>
 #include "../VERSION"
 
+#include <chrono>
+
+using time_point_t =  std::chrono::high_resolution_clock::time_point;
+
+inline time_point_t time_now() {
+    return std::chrono::high_resolution_clock::now();
+}
+
+template <class T_I = std::chrono::milliseconds>
+static auto time_duration(const time_point_t& l, const time_point_t& r)
+      -> decltype(std::chrono::duration_cast<T_I>(l - r)) {
+          return std::chrono::duration_cast<T_I>(l - r);
+      }
+struct duration_tracker {
+  sim_t& sim;
+  time_point_t time_start;
+
+  duration_tracker(sim_t& sim): sim(sim), time_start(time_now()) { }
+};
+duration_tracker* g_duration_tracker_ptr = nullptr;
+
+typedef void (*pre_exit_handler) ();
+extern void register_pre_exit_handler(pre_exit_handler p);
+
+void g_print_duration() {
+  if (!g_duration_tracker_ptr)
+    return;
+
+  const time_point_t& run_start = g_duration_tracker_ptr->time_start;
+  sim_t& sim = g_duration_tracker_ptr->sim;
+
+  time_point_t run_end = time_now();
+  uint64_t duration = time_duration(run_end, run_start).count();
+  if (duration < 1) duration = 1;
+  uint64_t icount = 0;
+  for (size_t i = 0; i < sim.nprocs(); i++)
+    icount += sim.get_core(i)->get_state()->ctr_exec;
+  double MIPS = icount * 1.0 / (duration * 1.0 / 1000) / 1000000;
+  fprintf(stderr, "\ninstructions executed %lu (%.4f MIPS)\n", icount, MIPS);
+
+}
+
 static void help(int exit_code = 1)
 {
   fprintf(stderr, "Spike RISC-V ISA Simulator " SPIKE_VERSION "\n\n");
@@ -320,6 +362,10 @@ int main(int argc, char** argv)
   s.set_log(log);
   s.set_histogram(histogram);
   s.set_log_commits(log_commits);
+
+  duration_tracker tracker(s);
+  g_duration_tracker_ptr = &tracker;
+  register_pre_exit_handler(&g_print_duration);
 
   auto return_code = s.run();
 

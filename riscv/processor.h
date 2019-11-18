@@ -226,6 +226,7 @@ struct state_t
   reg_t hwrnd;
   reg_t mtagcr;
 
+  uint64_t ctr_exec;
   reg_t prv;    // TODO: Can this be an enum instead?
   reg_t misa;
   reg_t mstatus;
