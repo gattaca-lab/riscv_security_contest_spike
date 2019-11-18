@@ -51,8 +51,13 @@ void g_print_duration() {
   uint64_t icount = 0;
   for (size_t i = 0; i < sim.nprocs(); i++)
     icount += sim.get_core(i)->get_state()->ctr_exec;
-  double MIPS = icount * 1.0 / (duration * 1.0 / 1000) / 1000000;
-  fprintf(stderr, "\ninstructions executed %lu (%.4f MIPS)\n", icount, MIPS);
+  double seconds = duration * 1.0 / 1000.0;
+  double MIPS = icount * 1.0 / (seconds) / 1000000;
+  fprintf(stderr,
+          "\ninstructions executed %lu (duration: %.3fs, perf %.4f MIPS)\n\n",
+          icount,
+          seconds,
+          MIPS);
 
 }
 
