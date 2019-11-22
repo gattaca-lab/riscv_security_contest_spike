@@ -139,7 +139,7 @@ bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
     return true;
 }
 void mtag_ext_t::set_mode(mode m) {
-    (void)m;
+    mode_ = m;
     return;
 }
 
