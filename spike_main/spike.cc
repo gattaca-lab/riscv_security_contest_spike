@@ -14,6 +14,7 @@
 #include <memory>
 #include "../VERSION"
 
+#include "soc/bh_debug.h"
 #include <chrono>
 
 using time_point_t =  std::chrono::high_resolution_clock::time_point;
@@ -190,6 +191,7 @@ static std::vector<std::pair<reg_t, mem_t*>> make_mems(const char* arg)
 
 int main(int argc, char** argv)
 {
+  LogInfo::initialize();
   bool debug = false;
   bool halted = false;
   bool histogram = false;
