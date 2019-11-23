@@ -6,6 +6,20 @@
 
 en_logv LogInfo::verbosity_ = en_logv::always;
 
+const char* en2s(en_logv e) {
+  switch(e) {
+  case en_logv::always:
+    return "[A] ";
+  case en_logv::error:
+    return "[E] ";
+  case en_logv::debug:
+    return "[D] ";
+  case en_logv::noise:
+    return "[N] ";
+  default:
+    return "[FIX_ME] ";
+  }
+}
 void LogInfo::initialize() {
 
   verbosity_ = en_logv::always;
