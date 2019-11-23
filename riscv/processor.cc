@@ -17,6 +17,8 @@
 #include <string>
 #include <algorithm>
 
+#include "soc/bh_debug.h"
+
 #undef STATE
 #define STATE state
 
@@ -286,7 +288,7 @@ static int ctz(reg_t val)
 
 void processor_t::take_interrupt(reg_t pending_interrupts)
 {
-  // fprintf(stderr, "....trying to take interrupt...\n");
+  LOG_MSG(en_logv::debug, "processor: ...trying to take interrupt... \n");
   reg_t mie = get_field(state.mstatus, MSTATUS_MIE);
   reg_t m_enabled = state.prv < PRV_M || (state.prv == PRV_M && mie);
   reg_t enabled_interrupts = pending_interrupts & ~state.mideleg & -m_enabled;
@@ -382,14 +384,14 @@ void processor_t::take_trap(trap_t& t, reg_t epc)
           || t.cause() == CAUSE_USER_ECALL
           || t.cause() == CAUSE_SUPERVISOR_ECALL)
      ) {
-      fprintf(stderr, "core %d, TEST_EXIT sequence detected!\n", id);
+      LOG_MSG(en_logv::always, "core %d, TEST_EXIT sequence detected!\n", id);
       int status_code = (state.XPR[1] == 0x0A11C001)
                       ? EXIT_SUCCESS
                       : EXIT_FAILURE;
       if (status_code == EXIT_SUCCESS)
-          fprintf(stderr, "test result: SUCCESS\n");
+          LOG_MSG(en_logv::always, "test result: SUCCESS\n");
       else
-          fprintf(stderr, "test result: FAILURE\n");
+          LOG_MSG(en_logv::always, "test result: FAILURE\n");
 
       if (ptr_pre_exit_handler)
         ptr_pre_exit_handler();
@@ -512,7 +514,7 @@ void processor_t::set_csr(int which, reg_t val)
       state.mtagcr = val;
       if (state.mtagcr & MTAG_FLD_IACK) {
         if (state.mip & MIP_EXT_MTAG_IP) {
-          fprintf(stderr, "  mtags: pending interrupt acknowledged\n");
+          LOG_MSG(en_logv::debug, "mtags: pending interrupt acknowledged\n");
           // hack to make mtags work
           state.mip ^= MIP_EXT_MTAG_IP;
         }
@@ -536,13 +538,13 @@ void processor_t::set_csr(int which, reg_t val)
         // if we changed mie.mtag_IE
         if ((prev_mtag_ip & state.mie) == 0) {
           if (state.mie & MIP_EXT_MTAG_IP) {
-            fprintf(stderr,
+            LOG_MSG(en_logv::always,
                     "%s",
                     "   I am thou... Thou art I...\n"
                     "   I'm the bone of the Beehive.\n"
                     "   Behold! The BeeKing.\n");
           } else {
-            fprintf(stderr, "  mtag: mtag checking disabled\n");
+            LOG_MSG(en_logv::always, "  mtag: mtag checking disabled\n");
           }
         }
       }

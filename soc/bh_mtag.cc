@@ -1,11 +1,13 @@
 #include "riscv/sim.h"
 #include "riscv/mmu.h"
+#include "bh_debug.h"
 #include "bh_mtag.h"
 
 #include <unordered_map>
 #include <exception>
 #include <memory>
 #include <vector>
+
 
 // NOTE: we don't need this one for C++14
 template<typename T, typename... Args>
@@ -63,7 +65,7 @@ bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
     return true;
   }
   if (mode_ == mode::ic) {
-    fprintf(stderr, "  WARNING: IC-LEVEL tag match is not implemented!\n");
+    LOG_MSG(en_logv::always, "  WARNING: IC-LEVEL tag match is not implemented!\n");
     return true;
   }
   if ((mode_ == mode::dc) && (type == op_type::I)) {
@@ -75,10 +77,10 @@ bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
     unsigned dst_tag = ~0u;
     load_tag(i * 16, dst_tag);
     if (SRC_TAG != dst_tag) {
-      fprintf(stderr,
+      LOG_MSG(en_logv::error,
               "  ATTENTION: INTRUDER DETECTED "
               "[dst_tag=%u,src_tag=%u]!\n", dst_tag, SRC_TAG);
-      fprintf(stderr,
+      LOG_MSG(en_logv::error,
               "  Breach ID: 0x%08lx (pure: 0x%08lx)\n",
               addr, untag_address(addr));
 
@@ -104,38 +106,39 @@ reg_t mtag_ext_t::untag_address(reg_t addr) const {
 }
 bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
     if (!impl_.validate_address(addr)) {
-        fprintf(stderr, "  WARNING: mtag::store_tag - address validation failed\n");
+        LOG_MSG(en_logv::error, "mtag::store_tag - address validation failed\n");
         return false;
     }
     unsigned t_a = impl_.va2tag(addr);
     if (t_a == impl_.INVALID_MAPPING) {
-        fprintf(stderr, "  WARNING: mtag::store_tag no va->tag mapping\n");
+        LOG_MSG(en_logv::error, "mtag::store_tag no va->tag mapping\n");
         return false;
     }
     impl_.tag_mem[t_a] = tag;
-    // fprintf(stderr, "writing %u->@%u\n", tag, t_a);
+    LOG_MSG(en_logv::noise, "mtag::store_tag - writing %u->@%u\n", tag, t_a);
     return true;
 }
 bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
     tag = 0;
     if (!impl_.validate_address(addr)) {
-        fprintf(stderr, "  WARNING: mtag::store_tag - address validation failed\n");
+        LOG_MSG(en_logv::error, "mtag::load_tag - address validation failed\n");
         return false;
     }
     unsigned t_a = impl_.va2tag(addr);
     if (t_a == impl_.INVALID_MAPPING) {
-        fprintf(stderr, "  WARNING: mtag::load_tag no va->tag mapping\n");
+        LOG_MSG(en_logv::error, "mtag::load_tag no va->tag mapping\n");
         return false;
     }
     auto it = impl_.tag_mem.find(t_a);
     if (it == impl_.tag_mem.end()) {
-        fprintf(stderr,
-                "  WARNING: mtag::load_tag tries to access "
+        // NOTE: should be error, but for some tests (RIPE) this is too noisy.
+        LOG_MSG(en_logv::debug,
+                "mtag::load_tag tries to access "
                 "unitialized tag memory, returning \"0\"@%u\n", t_a);
         return true;
     }
     tag = it->second;
-    // fprintf(stderr, "reading %u<-@%u\n", tag, t_a);
+    LOG_MSG(en_logv::noise, "reading %u<-@%u\n", tag, t_a);
     return true;
 }
 void mtag_ext_t::set_mode(mode m) {
@@ -156,14 +159,14 @@ bool bh_mtag_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
     throw std::logic_error("should not happen (store)");
 }
 bool bh_mtag_t::initialize(sim_t& sim) {
-    fprintf(stderr, "initializing MTAG extention...\n");
+    LOG_MSG(en_logv::always, "initializing MTAG extention...\n");
     impl_ = make_unique<s_mtag_impl>();
     s_mtag_impl& impl = *impl_;
     const size_t nprocs = sim.nprocs();
     impl.imtags.resize(nprocs);
     for (size_t i = 0; i < nprocs; ++i) {
         impl.imtags[i] = make_unique<mtag_ext_t>(impl, *sim.get_core(i));
-        fprintf(stderr, "   +MTAG attached to core #%d\n", (unsigned)i);
+        LOG_MSG(en_logv::always, "   +MTAG attached to core #%d\n", (unsigned)i);
     }
     return true;
 }

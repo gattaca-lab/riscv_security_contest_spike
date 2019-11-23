@@ -5,6 +5,8 @@
 #include "processor.h"
 #include <stdio.h>
 
+#include "soc/bh_debug.h"
+
 void mmu_t::EXT_attach_mtags (mtag_ext_t* ext) {
     mtags = ext;
 }
@@ -138,10 +140,8 @@ void mmu_t::store_slow_path(reg_t addr, reg_t len, const uint8_t* bytes)
 {
   reg_t paddr = translate(addr, len, STORE);
 
-  /*
-  fprintf(stderr, "__addr = %#x, len = %d, paddr = %#x\n",
-           (unsigned int)addr, (unsigned int)len, (unsigned int)paddr);
-  */
+  LOG_MSG(en_logv::noise, "__addr = %#x, len = %d, paddr = %#x\n",
+          (unsigned int)addr, (unsigned int)len, (unsigned int)paddr);
 
   if (!matched_trigger) {
     reg_t data = reg_from_bytes(len, bytes);
@@ -157,7 +157,7 @@ void mmu_t::store_slow_path(reg_t addr, reg_t len, const uint8_t* bytes)
     else
       refill_tlb(addr, paddr, host_addr, STORE);
   } else if (!sim->mmio_store(paddr, len, bytes)) {
-    fprintf(stderr, "address is not even MMIO, trapping...\n");
+    LOG_MSG(en_logv::error, "address is not even MMIO, trapping...\n");
     throw trap_store_access_fault(addr);
   }
 }

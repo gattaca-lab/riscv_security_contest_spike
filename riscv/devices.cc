@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <sstream>
 
+#include "soc/bh_debug.h"
+
 std::string rom_device_t::description() const {
     std::stringstream ss;
     ss << "rom size: " << data.size() <<
@@ -31,8 +33,8 @@ void bus_t::add_device(reg_t addr, abstract_device_t* dev)
   // iteration over this sort, which it does. (python's
   // SortedDict is a good analogy)
   devices[addr] = dev;
-  fprintf(stderr, "adding device [%s], @%#x\n", dev->name(), (unsigned)addr);
-  fprintf(stderr, "   +%s\n", dev->description().c_str());
+  LOG_MSG(en_logv::always, "adding device [%s], @%#x\n", dev->name(), (unsigned)addr);
+  LOG_MSG(en_logv::always, "   +%s\n", dev->description().c_str());
 }
 
 bool bus_t::load(reg_t addr, size_t len, uint8_t* bytes)
@@ -49,10 +51,11 @@ bool bus_t::load(reg_t addr, size_t len, uint8_t* bytes)
   // The iterator points to the device after this, so
   // go back by one item.
   it--;
-  /*
-  fprintf(stderr, "bus_t::load input addr: %x, result: %x, base: %x\n",
+
+  LOG_MSG(en_logv::debug, 
+          "bus_t::load input addr: %x, result: %x, base: %x\n",
           (int)addr, (int)(addr - it->first), (int)it->first);
-  */
+
   return it->second->load(addr - it->first, len, bytes);
 }
 
@@ -64,10 +67,11 @@ bool bus_t::store(reg_t addr, size_t len, const uint8_t* bytes)
     return false;
   }
   it--;
-  /*
-  fprintf(stderr, "bus_t::store input addr: %x, result: %x, base: %x\n",
+
+  LOG_MSG(en_logv::debug,
+          "bus_t::store input addr: %x, result: %x, base: %x\n",
           (int)addr, (int)(addr - it->first), (int)it->first);
-  */
+
   return it->second->store(addr - it->first, len, bytes);
 }
 
@@ -76,7 +80,7 @@ std::pair<reg_t, abstract_device_t*> bus_t::find_device(reg_t addr)
   // See comments in bus_t::load
   auto it = devices.upper_bound(addr);
   if (devices.empty() || it == devices.begin()) {
-    fprintf(stderr, "no device found, returning default\n");
+    LOG_MSG(en_logv::debug, "bust_t::find_device no device found, returning default\n");
     return std::make_pair((reg_t)0, (abstract_device_t*)NULL);
   }
   it--;

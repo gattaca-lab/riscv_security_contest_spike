@@ -1,5 +1,6 @@
 #include "riscv/sim.h"
-#include "bh_timer.h"
+#include "soc/bh_timer.h"
+#include "soc/bh_debug.h"
 
 #include <memory>
 #include <chrono>
@@ -24,15 +25,18 @@ bool bh_timer_t::load (reg_t addr, size_t len, uint8_t* bytes) {
     return false;
 
   if ((addr >= ADDR_MTIME) && (addr + len <= ADDR_MTIME + 8)) {
-    fprintf(stderr, "  WARNING [bh_timer]: mtime is not implemented\n");
+    LOG_MSG(en_logv::error,
+            "  WARNING [bh_timer]: mtime is not implemented\n");
     std::memset(bytes, 0, len);
   }
   else if ((addr >= ADDR_MTIMECMP) && (addr + len <= ADDR_MTIMECMP + 8)) {
-    fprintf(stderr, "  WARNING [bh_timer]: mtimecmp is not implemented\n");
+    LOG_MSG(en_logv::error,
+            "[bh_timer]: mtimecmp is not implemented\n");
     std::memset(bytes, 0, len);
   }
   else if ((addr >= ADDR_MTIMECTRL) && (addr + len <= ADDR_MTIMECTRL + 8)) {
-    fprintf(stderr, "  WARNING [bh_timer]: mtimectrl is not implemented\n");
+    LOG_MSG(en_logv::error,
+            "[bh_timer]: mtimectrl is not implemented\n");
     std::memset(bytes, 0, len);
   }
   else if ((addr >= ADDR_AE_BASE) && (addr + len <= ADDR_AE_BASE + 8)) {
@@ -49,7 +53,7 @@ bool bh_timer_t::load (reg_t addr, size_t len, uint8_t* bytes) {
 }
 bool bh_timer_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
   if ((addr >= 0) && ((addr + len) <= MMIO_SIZE)) {
-    fprintf(stderr,
+    LOG_MSG(en_logv::error,
             "  WARNING [bh_timer]: stores to timer are ignored"
             "; addr = [%08lx, %lu]\n", addr, len);
     return true;

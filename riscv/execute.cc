@@ -1,5 +1,7 @@
 // See LICENSE for license details.
 
+#include "soc/bh_debug.h"
+
 #include "processor.h"
 #include "mmu.h"
 #include <cassert>
@@ -134,14 +136,14 @@ void processor_t::step(size_t n)
 
     try
     {
-      // fprintf(stderr, "take peinding...\n");
+      LOG_MSG(en_logv::noise, "take pending...\n");
       take_pending_interrupt();
 
       if (unlikely(slow_path()))
       {
         while (instret < n)
         {
-          // fprintf(stderr, "instret = %ld, N=%ld\n", instret, n);
+          LOG_MSG(en_logv::noise, "instret = %ld, N=%ld\n", instret, n);
           if (unlikely(!state.serialized && state.single_step == state.STEP_STEPPED)) {
             state.single_step = state.STEP_NONE;
             if (!state.debug_mode) {
@@ -155,7 +157,7 @@ void processor_t::step(size_t n)
             state.single_step = state.STEP_STEPPED;
           }
 
-          //fprintf(stderr, "loading instruction...\n");
+          LOG_MSG(en_logv::noise, "loading instruction...\n");
           insn_fetch_t fetch = mmu->load_insn(pc);
           if (debug && !state.serialized)
             disasm(fetch.insn);
@@ -271,7 +273,7 @@ void processor_t::step(size_t n)
       // there is activity.
       n = instret;
     }
-    // fprintf(stderr, "loop finished...\n");
+    LOG_MSG(en_logv::noise, "loop finished...\n");
     state.pessimize_execution = false;
 
     state.minstret += instret;

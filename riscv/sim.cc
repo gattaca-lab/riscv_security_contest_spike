@@ -1,6 +1,7 @@
 // See LICENSE for license details.
 
 #include "soc/soc.h"
+#include "soc/bh_debug.h"
 
 #include "sim.h"
 #include "mmu.h"
@@ -218,27 +219,26 @@ void sim_t::make_dtb()
   rom.resize((rom.size() + align - 1) / align * align);
 
   boot_rom.reset(new rom_device_t(rom));
+  LOG_MSG(en_logv::always, "WARNING: DTB ROM registration was DISABLED (expected)");
   // fprintf(stderr, "adding DTB rom\n");
   // bus.add_device(DEFAULT_RSTVEC, boot_rom.get());
 }
 
 char* sim_t::addr_to_mem(reg_t addr) {
   if (!paddr_ok(addr)) {
-    fprintf(stderr, "!paddr_ok\n");
+    LOG_MSG(en_logv::error, "sim_t::addr_to_mem - !paddr_ok\n");
     return NULL;
   }
   auto desc = bus.find_device(addr);
 
   if (auto mem = dynamic_cast<mem_t*>(desc.second)) {
-    /*
-    fprintf(stderr,
+    LOG_MSG(en_logv::noise,
             "fisrt: %#x, size: %d\n",
             (unsigned)desc.first, (unsigned)(mem->size()));
-    */
     if (addr - desc.first < mem->size())
       return mem->contents() + (addr - desc.first);
   } else {
-    // fprintf(stderr, "address: %lx, MMIO access?\n", addr);
+    LOG_MSG(en_logv::noise, "address: %lx, MMIO access?\n", addr);
   }
 
   return NULL;
