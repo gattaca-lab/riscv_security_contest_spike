@@ -33,6 +33,7 @@ struct s_mtag_impl {
     uint64_t GRANULE_SIZE = 16u;
 
     const unsigned INVALID_MAPPING = ~0u;
+    const bool is32va = true;
 };
 reg_t s_mtag_impl::untag_address(reg_t addr) const {
   return (addr & MASK_UNTAG) | (addr & MASK_VALIDATION);
@@ -71,6 +72,9 @@ bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
   if ((mode_ == mode::dc) && (type == op_type::I)) {
     return true;
   }
+  if (impl_.is32va) {
+    addr &= 0xffffffff;
+  }
   const unsigned SRC_TAG = impl_.extract_tag(addr);
   for(unsigned i = impl_.va2tag(addr),
       e = impl_.va2tag(addr + size - 1) + 1; i < e; ++i) {
@@ -105,6 +109,9 @@ reg_t mtag_ext_t::untag_address(reg_t addr) const {
   return impl_.untag_address(addr);
 }
 bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
+    if (impl_.is32va) {
+      addr &= 0xffffffff;
+    }
     if (!impl_.validate_address(addr)) {
         LOG_MSG(en_logv::error, "mtag::store_tag - address validation failed\n");
         return false;
@@ -122,6 +129,9 @@ bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
 }
 bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
     tag = 0;
+    if (impl_.is32va) {
+      addr &= 0xffffffff;
+    }
     if (!impl_.validate_address(addr)) {
         LOG_MSG(en_logv::error, "mtag::load_tag - address validation failed\n");
         return false;
