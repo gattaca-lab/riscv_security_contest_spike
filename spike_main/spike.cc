@@ -74,7 +74,9 @@ static void help(int exit_code = 1)
   fprintf(stderr, "                          at base addresses a and b (with 4 KiB alignment)\n");
   fprintf(stderr, "  -d                    Interactive debug mode\n");
   fprintf(stderr, "  -g                    Track histogram of PCs\n");
-  fprintf(stderr, "  -l                    Generate a log of execution\n");
+  fprintf(stderr, "  -l                    Generate a log of execution\n"
+                  "     IMPORTANT: please set \"VERBOSITY\" environment variable to print auxiliary informaion.\n"
+                  "     Example: `VERBOSITY=5 ./spike -l ...`. The log is printed to stderr.\n");
   fprintf(stderr, "  -h, --help            Print this help message\n");
   fprintf(stderr, "  -H                    Start halted, allowing a debugger to connect\n");
   fprintf(stderr, "  --isa=<name>          RISC-V ISA string [default %s]\n", DEFAULT_ISA);
