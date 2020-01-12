@@ -16,6 +16,8 @@ const char* en2s(en_logv e) {
     return "[D] ";
   case en_logv::noise:
     return "[N] ";
+  case en_logv::info:
+    return "[I] ";
   default:
     return "[FIX_ME] ";
   }
