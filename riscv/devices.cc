@@ -33,8 +33,8 @@ void bus_t::add_device(reg_t addr, abstract_device_t* dev)
   // iteration over this sort, which it does. (python's
   // SortedDict is a good analogy)
   devices[addr] = dev;
-  LOG_MSG(en_logv::always, "adding device [%s], @%#x\n", dev->name(), (unsigned)addr);
-  LOG_MSG(en_logv::always, "   +%s\n", dev->description().c_str());
+  LOG_MSG(en_logv::info, "adding device [%s], @%#x\n", dev->name(), (unsigned)addr);
+  LOG_MSG(en_logv::info, "   +%s\n", dev->description().c_str());
 }
 
 bool bus_t::load(reg_t addr, size_t len, uint8_t* bytes)

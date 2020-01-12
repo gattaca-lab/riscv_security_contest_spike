@@ -37,11 +37,11 @@ bool abstract_soc_t::register_impl(std::string impl, factory_function func)
     auto& f = FactoryStorage::Instance();
     if (f.registry.find(impl) == f.registry.end()) {
         f.registry.insert({impl, func});
-        LOG_MSG(en_logv::always,
+        LOG_MSG(en_logv::info,
                 "note: registered <%s>\n", impl.c_str());
         return true;
     }
-    LOG_MSG(en_logv::always,
+    LOG_MSG(en_logv::error,
             "error: factory function for <%s> soc is already registered!\n",
             impl.c_str());
     throw std::runtime_error("already registered");
@@ -68,7 +68,7 @@ std::unique_ptr<abstract_soc_t> abstract_soc_t::create(
 
     auto it = f.registry.find(soc_name);
     if (it == f.registry.end()) {
-        LOG_MSG(en_logv::always,
+        LOG_MSG(en_logv::error,
                 "error: could not find factory function for <%s>:<%s>\n",
                 soc_name.c_str(),
                 opt.c_str());

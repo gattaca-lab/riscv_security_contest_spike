@@ -6,6 +6,7 @@
 enum class en_logv: int {
   always = 0,
   error,
+  info,
   debug,
   noise
 };

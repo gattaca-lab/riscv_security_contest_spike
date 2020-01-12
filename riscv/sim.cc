@@ -219,7 +219,7 @@ void sim_t::make_dtb()
   rom.resize((rom.size() + align - 1) / align * align);
 
   boot_rom.reset(new rom_device_t(rom));
-  LOG_MSG(en_logv::always, "WARNING: DTB ROM registration was DISABLED (expected)");
+  LOG_MSG(en_logv::info, "WARNING: DTB ROM registration was DISABLED (expected)\n");
   // fprintf(stderr, "adding DTB rom\n");
   // bus.add_device(DEFAULT_RSTVEC, boot_rom.get());
 }

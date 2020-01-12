@@ -6,6 +6,7 @@
 #include "mmu.h"
 #include "sim.h"
 
+#include "soc/bh_debug.h"
 #include "debug_rom/debug_rom.h"
 #include "debug_rom_defines.h"
 
@@ -49,9 +50,12 @@ debug_module_t::debug_module_t(sim_t *sim, const debug_module_config_t &config) 
   hart_state(1 << field_width(sim->nprocs())),
   hart_array_mask(sim->nprocs())
 {
-  D(fprintf(stderr, "debug_data_start=0x%x\n", debug_data_start));
-  D(fprintf(stderr, "debug_progbuf_start=0x%x\n", debug_progbuf_start));
-  D(fprintf(stderr, "debug_abstract_start=0x%x\n", debug_abstract_start));
+  LOG_MSG(en_logv::noise, "debug_data_start=0x%x (former D(fprintf(...)))\n",
+          debug_data_start);
+  LOG_MSG(en_logv::noise, "debug_progbuf_start=0x%x (former D(fprintf(...)))\n",
+          debug_progbuf_start);
+  LOG_MSG(en_logv::noise, "debug_abstract_start=0x%x (former D(fprintf(...)))\n",
+          debug_abstract_start);
 
   assert(nprocs <= 1024);
 

@@ -538,13 +538,13 @@ void processor_t::set_csr(int which, reg_t val)
         // if we changed mie.mtag_IE
         if ((prev_mtag_ip & state.mie) == 0) {
           if (state.mie & MIP_EXT_MTAG_IP) {
-            LOG_MSG(en_logv::always,
-                    "%s",
+            LOG_MSG(en_logv::info,
+                    "\n%s",
                     "   I am thou... Thou art I...\n"
                     "   I'm the bone of the Beehive.\n"
                     "   Behold! The BeeKing.\n");
           } else {
-            LOG_MSG(en_logv::always, "  mtag: mtag checking disabled\n");
+            LOG_MSG(en_logv::info, "  mtag: mtag checking disabled\n");
           }
         }
       }

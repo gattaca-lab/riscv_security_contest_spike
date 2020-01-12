@@ -65,7 +65,7 @@ bool mtag_ext_t::check_tag(reg_t addr, size_t size, op_type type) const {
     return true;
   }
   if (mode_ == mode::ic) {
-    LOG_MSG(en_logv::always, "  WARNING: IC-LEVEL tag match is not implemented!\n");
+    LOG_MSG(en_logv::error, "  WARNING: IC-LEVEL tag match is not implemented!\n");
     return true;
   }
   if ((mode_ == mode::dc) && (type == op_type::I)) {
@@ -159,14 +159,14 @@ bool bh_mtag_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
     throw std::logic_error("should not happen (store)");
 }
 bool bh_mtag_t::initialize(sim_t& sim) {
-    LOG_MSG(en_logv::always, "initializing MTAG extention...\n");
+    LOG_MSG(en_logv::info, "initializing MTAG extention...\n");
     impl_ = make_unique<s_mtag_impl>();
     s_mtag_impl& impl = *impl_;
     const size_t nprocs = sim.nprocs();
     impl.imtags.resize(nprocs);
     for (size_t i = 0; i < nprocs; ++i) {
         impl.imtags[i] = make_unique<mtag_ext_t>(impl, *sim.get_core(i));
-        LOG_MSG(en_logv::always, "   +MTAG attached to core #%d\n", (unsigned)i);
+        LOG_MSG(en_logv::info, "   +MTAG attached to core #%d\n", (unsigned)i);
     }
     return true;
 }

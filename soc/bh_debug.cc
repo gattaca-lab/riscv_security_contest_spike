@@ -22,7 +22,7 @@ const char* en2s(en_logv e) {
 }
 void LogInfo::initialize() {
 
-  verbosity_ = en_logv::always;
+  verbosity_ = en_logv::error;
 
   const char* env_val = std::getenv("VERBOSE");
   if (!env_val)

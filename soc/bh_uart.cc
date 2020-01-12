@@ -19,7 +19,7 @@ bool bh_uart_t::init(std::string io_port) {
     if (io_port.empty()) {
         io_port = "io.txt";
     }
-    LOG_MSG(en_logv::always,
+    LOG_MSG(en_logv::info,
             "initializing uart: io_port=[%s]\n", io_port.c_str());
     if (io_port == "--") {
         io_port_ = STDOUT_FILENO;
@@ -28,7 +28,7 @@ bool bh_uart_t::init(std::string io_port) {
                         O_WRONLY | O_TRUNC | O_CREAT,
                         S_IRUSR | S_IWUSR);
         if (io_port_ < 0) {
-            LOG_MSG(en_logv::always,
+            LOG_MSG(en_logv::error,
                     "[uart error]: could not initialize io_port\n");
             exit(EXIT_FAILURE);
             return false;
