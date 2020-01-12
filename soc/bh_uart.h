@@ -5,7 +5,7 @@
 
 class bh_uart_t: public abstract_device_t {
 public:
-  static constexpr uint64_t ADDR_BASE = 0x80000000;
+  static constexpr uint64_t ADDR_BASE = 0x8000000;
   static constexpr uint64_t OFFSET_TX = 0x4;
   static constexpr uint64_t ADDR_TX = ADDR_BASE + OFFSET_TX;
 

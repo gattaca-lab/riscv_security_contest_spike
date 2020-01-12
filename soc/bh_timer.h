@@ -5,7 +5,7 @@
 
 class bh_timer_t: public abstract_device_t {
 public:
-  static const reg_t DEVICE_BASE = 0x40000000;
+  static const reg_t DEVICE_BASE = 0x4000000;
   static const reg_t MMIO_SIZE   = 0x20;
 
   bh_timer_t();

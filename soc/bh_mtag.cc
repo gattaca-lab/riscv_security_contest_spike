@@ -27,10 +27,10 @@ struct s_mtag_impl {
     std::vector<imtag> imtags;
     std::unordered_map<unsigned, unsigned> tag_mem;
 
-    uint64_t MASK_UNTAG = (1u << 26u) - 1;
-    uint64_t MASK_TAG   = 0xfu << 26u;
+    uint64_t MASK_UNTAG = (1u << 28u) - 1;
+    uint64_t MASK_TAG   = 0xfu << 28u;
     uint64_t MASK_VALIDATION = ~(MASK_TAG | MASK_UNTAG);
-    uint64_t GRANULE_SIZE = 16;
+    uint64_t GRANULE_SIZE = 16u;
 
     const unsigned INVALID_MAPPING = ~0u;
 };
@@ -38,7 +38,7 @@ reg_t s_mtag_impl::untag_address(reg_t addr) const {
   return (addr & MASK_UNTAG) | (addr & MASK_VALIDATION);
 }
 unsigned s_mtag_impl::extract_tag(reg_t addr) const {
-  return ((addr & MASK_TAG) >> 26) & 0xf;
+  return (((addr & MASK_TAG) >> 28u) & 0xfu);
 }
 unsigned s_mtag_impl::va2tag(reg_t addr) const {
   if (!validate_address(addr)) {
