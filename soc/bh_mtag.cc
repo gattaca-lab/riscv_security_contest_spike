@@ -115,7 +115,9 @@ bool mtag_ext_t::store_tag(reg_t addr, unsigned tag) {
         return false;
     }
     impl_.tag_mem[t_a] = tag;
-    LOG_MSG(en_logv::noise, "mtag::store_tag - writing %u->@%u\n", tag, t_a);
+    LOG_MSG(en_logv::noise,
+            "mtag::store_tag - writing %u->@%u(ta) for @0x%lx\n",
+            tag, t_a, addr);
     return true;
 }
 bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
@@ -134,11 +136,13 @@ bool mtag_ext_t::load_tag(reg_t addr, unsigned& tag) const {
         // NOTE: should be error, but for some tests (RIPE) this is too noisy.
         LOG_MSG(en_logv::debug,
                 "mtag::load_tag tries to access "
-                "unitialized tag memory, returning \"0\"@%u\n", t_a);
+                "unitialized tag memory, returning \"0\"@%u(ta) for @0x%lx\n",
+                t_a, addr);
         return true;
     }
     tag = it->second;
-    LOG_MSG(en_logv::noise, "reading %u<-@%u\n", tag, t_a);
+    LOG_MSG(en_logv::noise, "reading %u<-@%u(ta) for @0x%lx\n",
+            tag, t_a, addr);
     return true;
 }
 void mtag_ext_t::set_mode(mode m) {
