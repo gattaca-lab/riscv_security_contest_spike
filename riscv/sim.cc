@@ -155,6 +155,14 @@ void sim_t::set_histogram(bool value)
   }
 }
 
+void sim_t::set_skip_tags(bool value)
+{
+  skip_tags_enabled = value;
+  for (size_t i = 0; i < procs.size(); i++) {
+    procs[i]->set_skip_tags(skip_tags_enabled);
+  }
+}
+
 void sim_t::set_log_commits(bool value)
 {
   log_commits_enabled = value;

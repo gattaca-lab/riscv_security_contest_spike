@@ -36,6 +36,7 @@ public:
   void set_log(bool value);
   void set_histogram(bool value);
   void set_log_commits(bool value);
+  void set_skip_tags(bool value);
   void set_procs_debug(bool value);
   void set_dtb_enabled(bool value) {
     this->dtb_enabled = value;
@@ -72,6 +73,7 @@ private:
   bool log = false;
   bool histogram_enabled = false; // provide a histogram of PCs
   bool log_commits_enabled = false;
+  bool skip_tags_enabled = false;
   bool dtb_enabled = false;
   remote_bitbang_t* remote_bitbang = nullptr;
 

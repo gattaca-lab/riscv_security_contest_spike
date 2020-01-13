@@ -88,7 +88,18 @@ public:
   #define load_func(type) \
     inline type##_t load_##type(reg_t addr) { \
       if (mtags) { \
-        mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
+        bool really_check = true; \
+        if (proc->get_skip_tags()) { \
+          insn_fetch_t fetch = load_insn(proc->state.pc); \
+          bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
+          bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
+          if (long_uses_sp || short_uses_sp) { \
+            really_check = false; \
+          } \
+        } \
+        if (really_check) { \
+          mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
+        } \
         addr = mtags->untag_address(addr); \
       } \
       if (unlikely(addr & (sizeof(type##_t)-1))) \
@@ -136,7 +147,18 @@ public:
   #define store_func(type) \
     void store_##type(reg_t addr, type##_t val) { \
       if (mtags) { \
-        mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::S); \
+        bool really_check = true; \
+        if (proc->get_skip_tags()) { \
+          insn_fetch_t fetch = load_insn(proc->state.pc); \
+          bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
+          bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
+          if (long_uses_sp || short_uses_sp) { \
+            really_check = false; \
+          } \
+        } \
+        if (really_check) { \
+          mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
+        } \
         addr = mtags->untag_address(addr); \
       } \
       if (unlikely(addr & (sizeof(type##_t)-1))) \
