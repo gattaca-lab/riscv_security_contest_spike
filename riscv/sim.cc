@@ -32,7 +32,7 @@ static void handle_signal(int sig)
 }
 
 sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
-             reg_t start_pc, std::vector<std::pair<reg_t, mem_t*>> mems,
+             reg_t s_pc, std::vector<std::pair<reg_t, mem_t*>> mems,
              std::vector<std::pair<reg_t, abstract_device_t*>> plugin_devices,
              const std::vector<std::string>& args,
              std::vector<int> const hartids,
@@ -57,6 +57,8 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
   if (hartids.size() == 0) {
     for (size_t i = 0; i < procs.size(); i++) {
       procs[i] = new processor_t(isa, varch, this, i, halted);
+      // since boot rom is disabled we have to initialize start PC this way
+      procs[i]->get_state()->pc = s_pc;
     }
   }
   else {
@@ -76,6 +78,7 @@ sim_t::sim_t(const char* isa, const char* varch, size_t nprocs, bool halted,
 
   clint.reset(new clint_t(procs));
   bus.add_device(CLINT_BASE, clint.get());
+  start_pc = s_pc;
 }
 
 sim_t::~sim_t()
