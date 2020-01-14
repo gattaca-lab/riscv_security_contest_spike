@@ -194,7 +194,6 @@ static std::vector<std::pair<reg_t, mem_t*>> make_mems(const char* arg)
 int main(int argc, char** argv)
 {
   LogInfo::initialize();
-  bool skip_tags = false;
   bool debug = false;
   bool halted = false;
   bool histogram = false;
@@ -332,7 +331,6 @@ int main(int argc, char** argv)
   parser.option(0, "dm-no-halt-groups", 0,
       [&](const char* s){dm_config.support_haltgroups = false;});
   parser.option(0, "log-commits", 0, [&](const char* s){log_commits = true;});
-  parser.option(0, "skip-tag-on-sp", 0, [&](const char* s){skip_tags = true;});
 
   auto argv1 = parser.parse(argv);
   std::vector<std::string> htif_args(argv1, (const char*const*)argv + argc);
@@ -373,7 +371,6 @@ int main(int argc, char** argv)
   s.set_log(log);
   s.set_histogram(histogram);
   s.set_log_commits(log_commits);
-  s.set_skip_tags(skip_tags);
 
   duration_tracker tracker(s);
   g_duration_tracker_ptr = &tracker;

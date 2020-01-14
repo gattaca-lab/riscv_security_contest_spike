@@ -107,9 +107,10 @@
 
 // mtag hack
 #define MIP_EXT_MTAG_IP     (1 << IRQ_EXT_SM_PAINIC)
-#define MTAG_FLD_ICEN  (1 << 2)
-#define MTAG_FLD_IACK  (1 << 1)
-#define MTAG_FLD_LSEN  (1 << 0)
+#define MTAG_FLD_SKIP_SP (1 << 3)
+#define MTAG_FLD_ICEN    (1 << 2)
+#define MTAG_FLD_IACK    (1 << 1)
+#define MTAG_FLD_LSEN    (1 << 0)
 
 #define SIP_SSIP MIP_SSIP
 #define SIP_STIP MIP_STIP

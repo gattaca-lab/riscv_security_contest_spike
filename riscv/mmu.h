@@ -89,7 +89,7 @@ public:
     inline type##_t load_##type(reg_t addr) { \
       if (mtags) { \
         bool really_check = true; \
-        if (proc->get_skip_tags()) { \
+        if (proc->state.mtagcr & MTAG_FLD_SKIP_SP) { \
           insn_fetch_t fetch = load_insn(proc->state.pc); \
           bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
           bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
@@ -148,7 +148,7 @@ public:
     void store_##type(reg_t addr, type##_t val) { \
       if (mtags) { \
         bool really_check = true; \
-        if (proc->get_skip_tags()) { \
+        if (proc->state.mtagcr & MTAG_FLD_SKIP_SP) { \
           insn_fetch_t fetch = load_insn(proc->state.pc); \
           bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
           bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
