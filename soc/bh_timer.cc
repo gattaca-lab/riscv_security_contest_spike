@@ -66,6 +66,9 @@ bool bh_timer_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
   const size_t ADDR_MTIMECTRL_HI = 0x14;
   const size_t ADDR_AE_BASE      = 0x18;
   
+  uint64_t mtime_cur = ((uint64_t)mtime_cur_hi << 32) | mtime_cur_lo;
+  uint64_t mtime_cmp = ((uint64_t)mtime_cmp_hi << 32) | mtime_cmp_lo;
+  
   if (!len)
     return false;
   if (!bytes)
@@ -108,10 +111,10 @@ bool bh_timer_t::initialize(sim_t& sim) {
   return true;
 }
 bool bh_timer_t::inc_timer () {
-  uint64_t mtime_tmp = (mtime_tmp_hi << 32) | mtime_tmp_lo;
-  uint64_t mtime_inc = (mtime_inc_hi << 32) | mtime_inc_lo;
-  uint64_t mtime_cur = (mtime_cur_hi << 32) | mtime_cur_lo;
-  uint64_t mtime_cmp = (mtime_cmp_hi << 32) | mtime_cmp_lo;
+  uint64_t mtime_tmp = ((uint64_t)mtime_tmp_hi << 32) | mtime_tmp_lo;
+  uint64_t mtime_inc = ((uint64_t)mtime_inc_hi << 32) | mtime_inc_lo;
+  uint64_t mtime_cur = ((uint64_t)mtime_cur_hi << 32) | mtime_cur_lo;
+  uint64_t mtime_cmp = ((uint64_t)mtime_cmp_hi << 32) | mtime_cmp_lo;
   // if no mtime_tgt_clk is set, timer is not enabled
   if (!mtime_inc)
     return false;
