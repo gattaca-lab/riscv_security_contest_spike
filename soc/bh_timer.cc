@@ -24,7 +24,7 @@ bool bh_timer_t::load (reg_t addr, size_t len, uint8_t* bytes) {
     return false;
   if (!bytes)
     return false;
-  if (!ptr_sim)
+  if (!ptr_proc)
     return false;
 
   if ((addr >= ADDR_MTIME_LO) && (addr + len <= ADDR_MTIME_LO + 4)) {
@@ -73,7 +73,7 @@ bool bh_timer_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
     return false;
   if (!bytes)
     return false;
-  if (!ptr_sim)
+  if (!ptr_proc)
     return false;
 
   if ((addr >= ADDR_MTIME_LO) && (addr + len <= ADDR_MTIME_LO + 4)) {
@@ -106,35 +106,40 @@ bool bh_timer_t::store (reg_t addr, size_t len, const uint8_t* bytes) {
   return false;
 }
 bool bh_timer_t::initialize(sim_t& sim) {
-  ptr_sim = &sim;
-  ptr_sim->get_core(0)->EXT_attach_timer(this);
+  ptr_proc = sim.get_core(0);
+  assert(ptr_proc);
+  ptr_proc->EXT_attach_timer(this);
   return true;
 }
 bool bh_timer_t::inc_timer () {
-  uint64_t mtime_tmp = ((uint64_t)mtime_tmp_hi << 32) | mtime_tmp_lo;
-  uint64_t mtime_inc = ((uint64_t)mtime_inc_hi << 32) | mtime_inc_lo;
-  uint64_t mtime_cur = ((uint64_t)mtime_cur_hi << 32) | mtime_cur_lo;
-  uint64_t mtime_cmp = ((uint64_t)mtime_cmp_hi << 32) | mtime_cmp_lo;
+
+  const uint64_t mtime_inc = ((uint64_t)mtime_inc_hi << 32) | mtime_inc_lo;
+
   // if no mtime_tgt_clk is set, timer is not enabled
   if (!mtime_inc)
     return false;
+
+  uint64_t mtime_tmp = ((uint64_t)mtime_tmp_hi << 32) | mtime_tmp_lo;
+  uint64_t mtime_cur = ((uint64_t)mtime_cur_hi << 32) | mtime_cur_lo;
+  uint64_t mtime_cmp = ((uint64_t)mtime_cmp_hi << 32) | mtime_cmp_lo;
+
   mtime_tmp++;
   if (mtime_tmp == mtime_inc) {
     mtime_tmp = 0;
     mtime_cur++;
   }
-
+  processor_t& proc = *ptr_proc;
   // check MTIE in MIE
-  bool timer_int_en = (ptr_sim->get_core(0)->get_state()->mie & (1<<7));
-  bool global_int_en = (ptr_sim->get_core(0)->get_state()->mstatus & MSTATUS_MIE);
+  bool timer_int_en = (proc.get_state()->mie & (1<<IRQ_M_TIMER));
+  bool global_int_en = (proc.get_state()->mstatus & MSTATUS_MIE);
 
   if (mtime_cur >= mtime_cmp) {
     if (timer_int_en && global_int_en) {
-      ptr_sim->get_core(0)->get_state()->mip |= MIP_MTIP;
+      proc.get_state()->mip |= MIP_MTIP;
     }
     return timer_int_en && global_int_en;
   } else {
-    ptr_sim->get_core(0)->get_state()->mip &= ~MIP_MTIP;
+    proc.get_state()->mip &= ~MIP_MTIP;
     return false;
   }
 }
