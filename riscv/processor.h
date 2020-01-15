@@ -11,6 +11,9 @@
 #include <map>
 #include <cassert>
 #include "debug_rom_defines.h"
+#include "soc/bh_timer.h"
+
+class bh_timer_t;
 
 class processor_t;
 class mmu_t;
@@ -436,8 +439,12 @@ public:
   }
 
   void trigger_updated();
+  
+  void EXT_attach_timer (bh_timer_t* timer);
+  bh_timer_t& get_timer();
 
 private:
+  bh_timer_t* timer = nullptr;
   simif_t* sim;
   mmu_t* mmu; // main memory is always accessed via the mmu
   extension_t* ext;

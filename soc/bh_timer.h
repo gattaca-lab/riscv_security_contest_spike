@@ -1,6 +1,8 @@
 #ifndef BH_TIMER_H_H02E87LB
 #define BH_TIMER_H_H02E87LB
 
+class sim_t;
+
 #include "riscv/devices.h"
 
 class bh_timer_t: public abstract_device_t {
@@ -20,8 +22,18 @@ public:
 
   bool initialize(sim_t& sim);
 
+  bool inc_timer();
+
 private:
   sim_t* ptr_sim = nullptr;
+  unsigned mtime_inc_lo = 0;
+  unsigned mtime_tmp_lo = 0;
+  unsigned mtime_cur_lo = 0;
+  unsigned mtime_cmp_lo = 0;
+  unsigned mtime_inc_hi = 0;
+  unsigned mtime_tmp_hi = 0;
+  unsigned mtime_cur_hi = 0;
+  unsigned mtime_cmp_hi = 0;
 };
 
 #endif /* end of include guard: BH_TIMER_H_H02E87LB */

@@ -1093,3 +1093,13 @@ void processor_t::trigger_updated()
     }
   }
 }
+
+void processor_t::EXT_attach_timer (bh_timer_t* t) {
+    timer = t;
+}
+bh_timer_t& processor_t::get_timer() {
+    if (!timer) {
+        throw std::runtime_error("timer is not initialized when requested");
+    }
+    return *timer;
+}

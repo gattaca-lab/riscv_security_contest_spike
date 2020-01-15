@@ -87,6 +87,12 @@ static reg_t execute_insn(processor_t* p, reg_t pc, insn_fetch_t fetch)
 {
   commit_log_stash_privilege(p);
   reg_t npc = fetch.func(p, fetch.insn, pc);
+  // on each instruction check if timer raised the disruption
+  if (p->get_timer().inc_timer()) {
+    p->get_state()->pessimize_execution = true;
+    p->get_mmu()->flush_icache();
+  }
+
   ++p->get_state()->ctr_exec;
   if (npc != PC_SERIALIZE_BEFORE) {
     if (p->get_log_commits()) {
