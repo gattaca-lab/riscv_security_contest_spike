@@ -86,18 +86,13 @@ public:
 
   // template for functions that load an aligned value from memory
   #define load_func(type) \
-    inline type##_t load_##type(reg_t addr) { \
+    inline type##_t load_##type(reg_t addr, bool sp_based = false) { \
       if (mtags) { \
-        bool really_check = true; \
+        bool skip_check = false; \
         if (proc->state.mtagcr & MTAG_FLD_SKIP_SP) { \
-          insn_fetch_t fetch = load_insn(proc->state.pc); \
-          bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
-          bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
-          if (long_uses_sp || short_uses_sp) { \
-            really_check = false; \
-          } \
+          skip_check = sp_based; \
         } \
-        if (really_check) { \
+        if (!skip_check) { \
           mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
         } \
         addr = mtags->untag_address(addr); \
@@ -145,18 +140,13 @@ public:
 
   // template for functions that store an aligned value to memory
   #define store_func(type) \
-    void store_##type(reg_t addr, type##_t val) { \
+    void store_##type(reg_t addr, type##_t val, bool sp_based = false) { \
       if (mtags) { \
-        bool really_check = true; \
+        bool skip_check = false; \
         if (proc->state.mtagcr & MTAG_FLD_SKIP_SP) { \
-          insn_fetch_t fetch = load_insn(proc->state.pc); \
-          bool long_uses_sp = (fetch.insn.length() == 4) && (fetch.insn.rs1() == X_SP); \
-          bool short_uses_sp = (fetch.insn.length() == 2) && (fetch.insn.rvc_rs1() == X_SP); \
-          if (long_uses_sp || short_uses_sp) { \
-            really_check = false; \
-          } \
+          skip_check = sp_based; \
         } \
-        if (really_check) { \
+        if (!skip_check) { \
           mtags->check_tag(addr, sizeof(type##_t), mtag_ext_t::op_type::L); \
         } \
         addr = mtags->untag_address(addr); \
